@@ -10,12 +10,12 @@ import {
   Modal,
   TouchableHighlight,
 } from 'react-native';
-import { CustomHeader } from './CustomHeader';
 import { CustomFooter } from './CustomFooter';
 import { CustomModal } from './CustomModal';
 import { Instruction } from './Instruction';
 import Images from '../Images/Images';
-import { Container, Button, Icon, Title, Content } from 'native-base';
+import { generateRandomNum } from '../Help';
+import { Container, Button, Icon, Toast, Content } from 'native-base';
 
 const styles = StyleSheet.create({
   image: {
@@ -23,67 +23,59 @@ const styles = StyleSheet.create({
     height: 120,
   },
   imageBox: {
-    paddingBottom: 65,
+    paddingBottom: 25,
   },
 });
 
 export const Game = ({ navigation, route }) => {
-  const generateCardBack = () => {
+  const generateCards = () => {
     let array = [];
-    for (i = 0; i < 9; i++) {
-      array.push(Images.cards.cardBack);
+    for (let i = 7; i > 0; i--) {
+      array.push({
+        imgNum: i - 1,
+        isDrawn: false,
+      });
+      array.push({
+        imgNum: i - 1,
+        isDrawn: false,
+      });
     }
     return array;
   };
 
-  const generateRandomNum = (count) => {
-    return Math.floor(Math.random() * count);
-  };
-
-  const generateRandomNumArry = (count) => {
-    let array = [];
-    const num1 = generateRandomNum(count);
-    array.push(num1);
-    while (array.length < 2) {
-      const num2 = generateRandomNum(count);
-      if (num1 !== num2) {
-        array.push(num2);
-      }
+  const randomize = (array) => {
+    for (let i = array.length; i > 0; i--) {
+      const r = Math.floor(Math.random() * i);
+      const temp = array[i - 1];
+      array[i - 1] = array[r];
+      array[r] = temp;
     }
-    array.sort();
     return array;
   };
 
-  const [imgArry, setImgArry] = useState(generateCardBack());
+  const images = Images.cards.cardPhotos;
+  const cardBack = Images.cards.cardBack;
+  const [imgArry, setImgArry] = useState(randomize(generateCards()));
   const [DrawnCardsIndex, setDrawnCardsIndex] = useState([]);
-  const [cardNoArry, setCardNoArry] = useState(generateRandomNumArry(9));
+  const [userImgNum, setUserImgNum] = useState([]);
+  const [userWonCards, setUserWonCards] = useState([]);
+  const [CPUImgNum, setCPUImgNum] = useState([]);
+  const [CPUWonCards, setCPUWonCards] = useState([]);
+  const [isCPUTurn, setisCPUTurn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [msg, setMsg] = useState('');
-  const [isStarted, setIsStarted] = useState(false);
 
   useEffect(() => {
-    if (cardNoArry.every((card) => DrawnCardsIndex.includes(card))) {
-      setMsg('You won!');
-      setModalVisible(true);
-      return;
+    if (userWonCards.length > 0) {
+      Toast.show({ text: '正解！' });
     }
+  }, [userWonCards]);
 
-    const isLost =
-      DrawnCardsIndex.length > 4 ||
-      (DrawnCardsIndex.length > 3 &&
-        !(
-          DrawnCardsIndex.includes(cardNoArry[0]) ||
-          DrawnCardsIndex.includes(cardNoArry[1])
-        ));
-
-    if (isLost) {
-      setMsg('You lost!');
-      setModalVisible(true);
-    }
-  }, [DrawnCardsIndex, cardNoArry]);
+  const CPUturn = () => {};
 
   const resetState = () => {
-    setImgArry(generateCardBack);
+    setImgArry();
+
     setCardNoArry(generateRandomNumArry(9));
     setDrawnCardsIndex([]);
   };
@@ -94,19 +86,33 @@ export const Game = ({ navigation, route }) => {
   // }, [modalVisible]);
 
   const handleButtonPress = (index) => {
+    console.log('ユーザーが勝ち取ったカード: ' + userWonCards);
+    console.log('ユーザーが引いた画像: ' + userImgNum);
+    console.log('引かれたカードINDEX: ' + DrawnCardsIndex);
     const copy = [...imgArry];
     let newImg;
-    if (cardNoArry.includes(index)) {
-      newImg = Images.cards.cardPhotos[route.params.imageNum];
-    } else {
-      newImg = Images.cards.cardFail;
-    }
-    copy[index] = newImg;
+
+    // isDrawnをtrueに
+    copy[index].isDrawn = true;
     setImgArry(copy);
 
-    setDrawnCardsIndex((prevState) => {
-      return [...prevState, index];
-    });
+    //drawnIndexに追加;
+    //引いたindexのimgNum確認;
+    setDrawnCardsIndex((prevState) => [...prevState, index]);
+    const imgNum = imgArry[index].imgNum;
+
+    //もしUserImgNum（Userが引いた画像種類）に含まれていルカCHK
+    // UserwOnCradに追加、useEffectでToast
+    if (userImgNum.includes(imgNum)) {
+      console.log('YAY FISRT PAIR!');
+      setUserWonCards((prevState) => [...prevState, imgNum]);
+
+      //含まれていなければuserImgNumに追加
+    } else {
+      setUserImgNum((prevState) => [...prevState, imgNum]);
+    }
+
+    // setisCPUTurn(true);
   };
 
   const closeModal = (btnName) => {
@@ -131,10 +137,11 @@ export const Game = ({ navigation, route }) => {
         }}
       >
         <View
+          pointerEvents={isCPUTurn ? 'none' : 'auto'}
           style={{
             flex: 1,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'space-evenly',
             flexWrap: 'wrap',
             flexGrow: 10,
           }}
@@ -148,7 +155,10 @@ export const Game = ({ navigation, route }) => {
                 }}
               >
                 <View style={styles.imageBox}>
-                  <Image source={img} style={styles.image} />
+                  <Image
+                    source={img.isDrawn ? images[img.imgNum] : cardBack}
+                    style={styles.image}
+                  />
                 </View>
               </TouchableOpacity>
             ))}
@@ -160,7 +170,11 @@ export const Game = ({ navigation, route }) => {
           msg={msg}
         />
       </Content>
-      <CustomFooter resetState={resetState} navigateToInst={navigateToInst} />
+      <CustomFooter
+        isCPUTurn={isCPUTurn}
+        resetState={resetState}
+        navigateToInst={navigateToInst}
+      />
     </Container>
   );
 };
