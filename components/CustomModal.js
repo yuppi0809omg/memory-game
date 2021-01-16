@@ -1,0 +1,95 @@
+import React, { useState } from 'react';
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from 'react-native';
+
+export const CustomModal = ({ modalVisible, msg, closeModal }) => {
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{msg}</Text>
+
+            <TouchableHighlight
+              style={{ ...styles.openButton }}
+              onPress={() => {
+                closeModal('AGAIN');
+              }}
+            >
+              <Text style={styles.textStyle}>もう一回</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={{ ...styles.openButton }}
+              onPress={() => {
+                closeModal('DONE');
+              }}
+            >
+              <Text style={styles.textStyle}>閉じる</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    width: '80%',
+
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  textStyle: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 20,
+  },
+  openButton: {
+    backgroundColor: 'lightgrey',
+    borderRadius: 15,
+    width: '100%',
+    padding: 20,
+    marginBottom: 5,
+    elevation: 2,
+    color: 'black',
+  },
+});

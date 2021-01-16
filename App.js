@@ -1,21 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Top } from './components/Top';
+import { Game } from './components/Game';
+import { Instruction } from './components/Instruction';
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Root } from 'native-base';
+// import { useFonts } from 'expo-font';
 
-export default function App() {
+const Stack = createStackNavigator();
+
+export default App = () => {
+  // let [fontsLoaded] = useFonts({
+  //   PottaOne: require('./assets/fonts/PottaOne-Regular.ttf'),
+  // });
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Root>
+      <NavigationContainer>
+        <Stack.Navigator style={{ fontFamily: 'PottaOne', fontSize: 40 }}>
+          <Stack.Screen
+            name="Top"
+            component={Top}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Instruction" component={Instruction} />
+          <Stack.Screen
+            name="Game"
+            component={Game}
+            options={{ headerLeft: null }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Root>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};
