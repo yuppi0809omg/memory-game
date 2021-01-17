@@ -60,7 +60,6 @@ export const Game = ({ navigation, route }) => {
   const [CPUWonCards, setCPUWonCards] = useState([]);
   const [isCPUTurn, setisCPUTurn] = useState(false);
   const [isTouchDisabled, setIsTouchDisabled] = useState(false);
-  const [isSecondTime, setIsSecondTime] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [msg, setMsg] = useState('');
   const [currentCard, setCurrentCard] = useState([]);
@@ -98,6 +97,8 @@ export const Game = ({ navigation, route }) => {
     setImgArry(randomize(generateCards()));
     setUserWonCards([]);
     setCPUWonCards([]);
+    setIsTouchDisabled(false);
+    setisCPUTurn(false);
   };
 
   const generateRandomNumArry = (count, length) => {
@@ -182,7 +183,7 @@ export const Game = ({ navigation, route }) => {
         let CPUWin = false;
         let i = 0;
 
-        do {
+        const doCPUTurn = () => {
           setTimeout(() => {
             console.log(i + 1 + '回目だ');
             const [CPUindex1, CPUindex2] = generateRandomNumArry(
@@ -209,9 +210,9 @@ export const Game = ({ navigation, route }) => {
               );
               setImgArry(newImgArry);
               //CPU勝ち
-              if (CPUWin) {
-                //削除
-                setTimeout(() => {
+
+              setTimeout(() => {
+                if (CPUWin) {
                   console.log('CPU勝ち');
                   newImgArry = newImgArry.filter(
                     (img, i) => !(i === CPUindex1 || i === CPUindex2)
@@ -221,11 +222,7 @@ export const Game = ({ navigation, route }) => {
                     ...prevState,
                     imgArry[CPUindex1].imgNum,
                   ]);
-                }, 1000);
-                //CPU外れ
-              } else {
-                // 元に戻す
-                setTimeout(() => {
+                } else {
                   console.log('CPU負け');
                   newImgArry = newImgArry.map((img, i) =>
                     i === CPUindex1 || i === CPUindex2
@@ -233,15 +230,20 @@ export const Game = ({ navigation, route }) => {
                       : img
                   );
                   setImgArry(newImgArry);
-
                   setisCPUTurn(false);
-                }, 1000);
-              }
+                }
+                if (CPUWin) {
+                  doCPUTurn();
+                }
+              }, 1000);
             }, 1000);
           }, 1000);
-        } while (CPUWin);
+        };
+
+        doCPUTurn();
       }
-    }, userTime);
+      //ユーザー→CPU
+    }, 1000);
   };
 
   const closeModal = (btnName) => {
