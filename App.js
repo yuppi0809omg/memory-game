@@ -27,7 +27,7 @@ export default App = () => {
           <Stack.Screen
             name="Game"
             component={Game}
-            options={{ headerLeft: null }}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>

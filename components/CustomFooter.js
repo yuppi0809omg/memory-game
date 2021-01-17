@@ -8,7 +8,7 @@ export const CustomFooter = ({ resetState, navigateToInst, isCPUTurn }) => {
       <FooterTab>
         <Button>
           <Text
-            pointerEvents={isCPUTurn ? true : false}
+            // pointerEvents={isCPUTurn ? true : false}
             onPress={() => {
               resetState();
             }}

@@ -36,7 +36,7 @@ export const Top = ({ navigation }) => {
             large
             style={{}}
             onPress={() => {
-              navigation.navigate('Instruction');
+              navigation.navigate('Game');
             }}
           >
             <CustomText

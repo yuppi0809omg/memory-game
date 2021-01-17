@@ -19,11 +19,11 @@ import { Container, Button, Icon, Toast, Content } from 'native-base';
 
 const styles = StyleSheet.create({
   image: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
   },
   imageBox: {
-    paddingBottom: 25,
+    paddingBottom: 15,
   },
 });
 
@@ -56,29 +56,63 @@ export const Game = ({ navigation, route }) => {
   const images = Images.cards.cardPhotos;
   const cardBack = Images.cards.cardBack;
   const [imgArry, setImgArry] = useState(randomize(generateCards()));
-  const [DrawnCardsIndex, setDrawnCardsIndex] = useState([]);
-  const [userImgNum, setUserImgNum] = useState([]);
   const [userWonCards, setUserWonCards] = useState([]);
-  const [CPUImgNum, setCPUImgNum] = useState([]);
   const [CPUWonCards, setCPUWonCards] = useState([]);
   const [isCPUTurn, setisCPUTurn] = useState(false);
+  const [isTouchDisabled, setIsTouchDisabled] = useState(false);
+  const [isSecondTime, setIsSecondTime] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [msg, setMsg] = useState('');
-
+  const [currentCard, setCurrentCard] = useState([]);
   useEffect(() => {
     if (userWonCards.length > 0) {
       Toast.show({ text: '正解！' });
     }
   }, [userWonCards]);
 
-  const CPUturn = () => {};
+  useEffect(() => {
+    if (imgArry.length === 0) {
+      return;
+    }
+    if (isCPUTurn) {
+      Toast.show({ text: 'CPUのターンです' });
+    }
+    if (!isCPUTurn) {
+      Toast.show({ text: 'あなたのターンです' });
+      setIsTouchDisabled(false);
+    }
+  }, [isCPUTurn]);
+
+  useEffect(() => {
+    if (imgArry.length === 0) {
+      const winner =
+        userWonCards.length > CPUWonCards.length ? 'あなた' : 'CPU';
+      setMsg(
+        `${userWonCards.length}対${CPUWonCards.length}\n${winner}の勝ち！`
+      );
+      setModalVisible(true);
+    }
+  }, [imgArry, userWonCards, CPUWonCards]);
 
   const resetState = () => {
-    setImgArry();
-
-    setCardNoArry(generateRandomNumArry(9));
-    setDrawnCardsIndex([]);
+    setImgArry(randomize(generateCards()));
+    setUserWonCards([]);
+    setCPUWonCards([]);
   };
+
+  const generateRandomNumArry = (count, length) => {
+    let array = [];
+    const num1 = generateRandomNum(count);
+    array.push(num1);
+    while (array.length < length) {
+      const num2 = generateRandomNum(count);
+      if (num1 !== num2) {
+        array.push(num2);
+      }
+    }
+    return array;
+  };
+
   // useEffect(() => {
   //   if (!modalVisible) {
   //     resetState();
@@ -86,33 +120,128 @@ export const Game = ({ navigation, route }) => {
   // }, [modalVisible]);
 
   const handleButtonPress = (index) => {
-    console.log('ユーザーが勝ち取ったカード: ' + userWonCards);
-    console.log('ユーザーが引いた画像: ' + userImgNum);
-    console.log('引かれたカードINDEX: ' + DrawnCardsIndex);
-    const copy = [...imgArry];
-    let newImg;
+    // カード選択後、タッチを無効化
+    setIsTouchDisabled(true);
+
+    //** 以下はcopy[index]時にstateが反映されてしまう...（なぜ？？）
+    // const copy = [...copy];
+    // copy[index].isDrawn = true;
 
     // isDrawnをtrueに
-    copy[index].isDrawn = true;
-    setImgArry(copy);
+    let newImgArry = imgArry.map((img, i) =>
+      i === index ? { ...img, isDrawn: true } : img
+    );
 
-    //drawnIndexに追加;
-    //引いたindexのimgNum確認;
-    setDrawnCardsIndex((prevState) => [...prevState, index]);
+    // カード裏返す
+    setImgArry(newImgArry);
+
+    // 1枚目なら、currentCardにカード情報追加し、リターン
     const imgNum = imgArry[index].imgNum;
-
-    //もしUserImgNum（Userが引いた画像種類）に含まれていルカCHK
-    // UserwOnCradに追加、useEffectでToast
-    if (userImgNum.includes(imgNum)) {
-      console.log('YAY FISRT PAIR!');
-      setUserWonCards((prevState) => [...prevState, imgNum]);
-
-      //含まれていなければuserImgNumに追加
-    } else {
-      setUserImgNum((prevState) => [...prevState, imgNum]);
+    if (currentCard.length === 0) {
+      console.log('cuurent card は0');
+      setCurrentCard((prevState) => [
+        ...prevState,
+        { index: index, imgNum: imgNum },
+      ]);
+      setIsTouchDisabled(false);
+      return;
     }
 
-    // setisCPUTurn(true);
+    if (currentCard[0].index === index) {
+      setIsTouchDisabled(false);
+      return;
+    }
+
+    const userTime = 1000;
+    const userWin = currentCard[0].imgNum === imgNum;
+    setTimeout(() => {
+      if (userWin) {
+        setUserWonCards((prevState) => [...prevState, imgNum]);
+
+        newImgArry = newImgArry.filter(
+          (img, i) => !(i === index || i === currentCard[0].index)
+        );
+        setImgArry(newImgArry);
+      } else {
+        // Toast.show({ text: '残念！' });
+
+        newImgArry = newImgArry.map((img, i) =>
+          i === index || i === currentCard[0].index
+            ? { ...img, isDrawn: false }
+            : img
+        );
+        setImgArry(newImgArry);
+      }
+      setCurrentCard([]);
+
+      // CPUのターン
+      if (userWin) {
+        setIsTouchDisabled(false);
+      } else {
+        setisCPUTurn(true);
+        let CPUWin = false;
+        let i = 0;
+
+        do {
+          setTimeout(() => {
+            console.log(i + 1 + '回目だ');
+            const [CPUindex1, CPUindex2] = generateRandomNumArry(
+              newImgArry.length,
+              2
+            );
+            console.log(CPUindex1 + 'と' + CPUindex2);
+            CPUWin =
+              newImgArry[CPUindex1].imgNum === newImgArry[CPUindex2].imgNum;
+            console.log(i + 1 + '回目');
+            i += 1;
+
+            // 一枚目引く
+            newImgArry = newImgArry.map((img, i) =>
+              i === CPUindex1 ? { ...img, isDrawn: true } : img
+            );
+
+            setImgArry(newImgArry);
+
+            // 二枚目引く
+            setTimeout(() => {
+              newImgArry = newImgArry.map((img, i) =>
+                i === CPUindex2 ? { ...img, isDrawn: true } : img
+              );
+              setImgArry(newImgArry);
+              //CPU勝ち
+              if (CPUWin) {
+                //削除
+                setTimeout(() => {
+                  console.log('CPU勝ち');
+                  newImgArry = newImgArry.filter(
+                    (img, i) => !(i === CPUindex1 || i === CPUindex2)
+                  );
+                  setImgArry(newImgArry);
+                  setCPUWonCards((prevState) => [
+                    ...prevState,
+                    imgArry[CPUindex1].imgNum,
+                  ]);
+                }, 1000);
+                //CPU外れ
+              } else {
+                // 元に戻す
+                setTimeout(() => {
+                  console.log('CPU負け');
+                  newImgArry = newImgArry.map((img, i) =>
+                    i === CPUindex1 || i === CPUindex2
+                      ? { ...img, isDrawn: false }
+                      : img
+                  );
+                  setImgArry(newImgArry);
+
+                  setisCPUTurn(false);
+                }, 1000);
+              }
+            }, 1000);
+          }, 1000);
+        } while (CPUWin);
+      }
+    }, userTime);
   };
 
   const closeModal = (btnName) => {
@@ -129,15 +258,17 @@ export const Game = ({ navigation, route }) => {
   };
 
   return (
-    <Container>
+    <Container style={{ opacity: isCPUTurn ? 0.8 : 1 }}>
       {/* // <CustomHeader /> */}
       <Content
         style={{
           paddingTop: 30,
+          height: 100,
+          overflow: 'hidden',
         }}
       >
         <View
-          pointerEvents={isCPUTurn ? 'none' : 'auto'}
+          pointerEvents={isTouchDisabled ? 'none' : 'auto'}
           style={{
             flex: 1,
             flexDirection: 'row',
