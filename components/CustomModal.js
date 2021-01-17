@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CustomText } from './CustomText';
 import {
   Alert,
   Modal,
@@ -21,7 +22,7 @@ export const CustomModal = ({ modalVisible, msg, closeModal }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>{msg}</Text>
+            <CustomText style={styles.modalText}>{msg}</CustomText>
 
             <TouchableHighlight
               style={{ ...styles.openButton }}
@@ -29,7 +30,7 @@ export const CustomModal = ({ modalVisible, msg, closeModal }) => {
                 closeModal('AGAIN');
               }}
             >
-              <Text style={styles.textStyle}>もう一回</Text>
+              <CustomText style={styles.textStyle}>もう一回</CustomText>
             </TouchableHighlight>
             <TouchableHighlight
               style={{ ...styles.openButton }}
@@ -37,7 +38,7 @@ export const CustomModal = ({ modalVisible, msg, closeModal }) => {
                 closeModal('DONE');
               }}
             >
-              <Text style={styles.textStyle}>閉じる</Text>
+              <CustomText style={styles.textStyle}>閉じる</CustomText>
             </TouchableHighlight>
           </View>
         </View>

@@ -22,7 +22,7 @@ export const Top = ({ navigation }) => {
         <Content contentContainerStyle={styles.centeredView}>
           <CustomText
             style={{
-              fontSize: 65,
+              fontSize: 45,
               color: 'white',
               textShadowRadius: 2,
               textShadowColor: 'grey',

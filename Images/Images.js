@@ -11,6 +11,10 @@ export default Images = {
       require('../assets/cards/IMG5.jpg'),
       require('../assets/cards/IMG6.jpg'),
       require('../assets/cards/IMG7.jpg'),
+      require('../assets/cards/IMG8.jpg'),
+      require('../assets/cards/IMG9.jpg'),
+      require('../assets/cards/IMG10.jpg'),
+      require('../assets/cards/IMG11.jpg'),
     ],
   },
 };
