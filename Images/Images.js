@@ -1,4 +1,4 @@
-export default Images = {
+const Images = {
   cards: {
     cardBack: require('../assets/cards/cardBack.jpg'),
     cardFail: require('../assets/cards/boo.png'),
@@ -18,3 +18,5 @@ export default Images = {
     ],
   },
 };
+
+export default Images;

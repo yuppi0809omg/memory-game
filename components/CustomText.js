@@ -1,6 +1,7 @@
 import { Text } from 'react-native';
 import React from 'react';
 import { useFonts } from 'expo-font';
+import { Spinner } from 'native-base';
 
 export const CustomText = ({ children, style }) => {
   let [fontsLoaded] = useFonts({
@@ -8,7 +9,7 @@ export const CustomText = ({ children, style }) => {
   });
 
   if (!fontsLoaded) {
-    return <Text>ロード中...</Text>;
+    return <Spinner color="red"></Spinner>;
   } else {
     return <Text style={{ ...style, fontFamily: 'PottaOne' }}>{children}</Text>;
   }

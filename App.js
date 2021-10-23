@@ -10,7 +10,7 @@ import { Root } from 'native-base';
 
 const Stack = createStackNavigator();
 
-export default App = () => {
+export default () => {
   // let [fontsLoaded] = useFonts({
   //   PottaOne: require('./assets/fonts/PottaOne-Regular.ttf'),
   // });
@@ -34,3 +34,4 @@ export default App = () => {
     </Root>
   );
 };
+

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+
 export const CustomModal = ({ modalVisible, msg, closeModal }) => {
   return (
     <View style={styles.centeredView}>

@@ -6,9 +6,9 @@ import { CustomText } from './CustomText';
 export const CustomFooter = ({ resetState, navigateToInst, isCPUTurn }) => {
   return (
     <Footer>
-      <FooterTab>
+      <FooterTab style={{ backgroundColor: 'lightgrey' }}>
         <Button
-          pointerEvents={isCPUTurn}
+          pointerEvents={isCPUTurn ? 'none' : 'auto'}
           onPress={() => {
             console.log('RESET!!');
             resetState();
@@ -18,7 +18,7 @@ export const CustomFooter = ({ resetState, navigateToInst, isCPUTurn }) => {
         </Button>
 
         <Button
-          pointerEvents={isCPUTurn}
+          pointerEvents={isCPUTurn ? 'none' : 'auto'}
           onPress={() => {
             console.log('RESET!!');
             resetState();

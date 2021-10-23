@@ -16,7 +16,7 @@ export const Top = ({ navigation }) => {
   return (
     <Container>
       <ImageBackground
-        source={Images.cards.cardPhotos[imgNum]}
+        source={Images.cards.cardFail}
         style={styles.image}
       >
         <Content contentContainerStyle={styles.centeredView}>
@@ -34,7 +34,6 @@ export const Top = ({ navigation }) => {
             block
             info
             large
-            style={{}}
             onPress={() => {
               navigation.navigate('Game');
             }}
