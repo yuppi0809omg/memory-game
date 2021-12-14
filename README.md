@@ -7,4 +7,8 @@ expo 40.0.0
 react-native 0.63.2
 
 # デモ
+
+＊Andoridのみ
+Expo Go をダウンロードして、以下の URL を開く：
 https://expo.dev/@yukok/memory-game
+
